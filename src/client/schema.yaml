@@ -1,0 +1,539 @@
+openapi: 3.0.1
+info:
+  title: Favorites service API
+  description: This service is responsible for handling user favorite lists.
+  version: "1.0"
+servers:
+  - url: /
+paths:
+  /{userId}/lists:
+    get:
+      tags:
+        - query
+      summary: Gets the lists of a user
+      description: |
+        This endpoint returns all lists created by a user, including the list count and details of each list.
+        It is useful for retrieving all lists associated with a user.
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: "Ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListsResponse'
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /{userId}/lists/{listId}:
+    get:
+      tags:
+        - query
+      summary: Gets the list details & content
+      description: |
+        This endpoint returns the details of a specific list, including its title and all items within it.
+        It is useful for viewing the contents of a list.
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: listId
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "200":
+          description: "Ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListResponse'
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: "List not found"
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /{userId}/lists/{listId}/accommodation-ids:
+    get:
+      tags:
+        - query
+      summary: Gets all the accommodation ids saved to a list
+      description: |
+        This endpoint returns all the accommodation IDs that are saved in a specific list.
+        It is useful for quickly retrieving the IDs without fetching full accommodation details.
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: listId
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "200":
+          description: "Ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAccomIdsResponse'
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /{userId}/lists/create:
+    post:
+      tags:
+        - mutate
+      summary: Creates a list
+      description: |
+        This endpoint allows you to create a new list for a user. 
+        The list will be empty initially.
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+      requestBody:
+        description: Create list payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListRequest'
+      responses:
+        "201":
+          description: "Ok"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateListResponse'
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /{userId}/lists/{listId}/update:
+    patch:
+      tags:
+        - mutate
+      summary: Update a list
+      description: |
+        This endpoint allows you to update the title of a list.
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: listId
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        description: Update list payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateListRequest'
+      responses:
+        "204":
+          description: "Ok"
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /{userId}/lists/{listId}/delete:
+    delete:
+      tags:
+        - mutate
+      summary: Delete a list
+      description: |
+        This endpoint allows you to delete a list permanently, including all its items.
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: listId
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "204":
+          description: "Ok"
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /{userId}/lists/{listId}/item/add:
+    post:
+      tags:
+        - mutate
+      summary: Add item to a list
+      description: |
+        This endpoint allows you to add an item to a list. 
+        If the item already exists in another list of the user, it will be removed from that 
+        list before being added to the specified list. If the item exists in the 
+        specified list, it will be updated with the new details.
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: listId
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        description: Add item to list payload
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddListItemRequest'
+      responses:
+        "201":
+          description: "Ok"
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /{userId}/lists/{listId}/item/{accommodationId}/remove:
+    delete:
+      tags:
+        - mutate
+      summary: Remove item from a list
+      description: |
+        This endpoint allows you to remove an item from a list.
+      parameters:
+        - in: path
+          name: userId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: listId
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - in: path
+          name: accommodationId
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "204":
+          description: "Ok"
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: string
+        "500":
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: string
+
+components:
+  schemas:
+    ListsResponse:
+      type: object
+      properties:
+        listCount:
+          type: integer
+          format: int
+        lists:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListOverviewItem'
+          x-oapi-codegen-extra-tags:
+            validate: required
+      required:
+        - listCount
+        - lists
+
+    ListOverviewItem:
+      type: object
+      properties:
+        title:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        listId:
+          type: integer
+          format: int64
+          x-oapi-codegen-extra-tags:
+            validate: required
+      required:
+        - title
+        - listId
+
+    ListResponse:
+      type: object
+      properties:
+        title:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        createdAt:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListItem'
+          x-oapi-codegen-extra-tags:
+            validate: required
+      required:
+        - title
+        - createdAt
+        - items
+
+    ListItem:
+      type: object
+      properties:
+        accommodationId:
+          type: integer
+          format: int64
+          x-oapi-codegen-extra-tags:
+            validate: required
+        accommodationRatingScore:
+          type: number
+          format: float
+          x-oapi-codegen-extra-tags:
+            validate: required
+        accommodationRatingCount:
+          type: integer
+          format: int64
+          x-oapi-codegen-extra-tags:
+            validate: required
+        accommodationName:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        accommodationCity:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerProviderName:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerProviderCode:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerDateFrom:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerDateTo:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerPriceEur:
+          type: number
+          format: float
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerPriceCurrency:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerPrice: 
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+      required:
+        - accommodationId
+        - accommodationRatingScore
+        - accommodationRatingCount
+        - accommodationName
+        - accommodationCity
+        - offerDateFrom 
+        - offerDateTo
+        - offerPriceEur
+        - offerPriceCurrency
+        - offerPrice
+        - offerProviderName
+        - offerProviderCode
+
+    ListAccomIdsResponse:
+      type: object
+      properties:
+        accommodationIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+          x-oapi-codegen-extra-tags:
+            validate: required
+      required:
+        - accommodationIds
+
+    CreateListRequest:
+      type: object
+      properties:
+        listTitle:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+      required:
+        - listTitle
+
+    CreateListResponse:
+      type: object
+      properties:
+        listId:
+          type: integer
+          format: int64
+      required:
+        - listId
+
+    UpdateListRequest:
+      type: object
+      properties:
+        listTitle:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+      required:
+        - listTitle
+
+    AddListItemRequest:
+      type: object
+      properties:
+        accommodationId:
+          type: integer
+          format: int64
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerDateFrom:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerDateTo:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerPrice:
+          type: number
+          format: float
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerPriceCurrency:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerPriceEur:
+          type: number
+          format: float
+          x-oapi-codegen-extra-tags:
+            validate: required
+        offerProviderCode:
+          type: string
+          x-oapi-codegen-extra-tags:
+            validate: required
+
+      required:
+        - accommodationId
+        - offerDateFrom      
+        - offerDateTo        
+        - offerPrice         
+        - offerPriceCurrency 
+        - offerPriceEur      
+        - offerProviderCode  

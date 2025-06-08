@@ -1,0 +1,5 @@
+apis:
+  favorites:
+    root: schema.yaml
+    x-openapi-ts:
+      output: ./generated/types.ts

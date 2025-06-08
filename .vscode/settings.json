@@ -1,0 +1,19 @@
+{
+  "[typescript]": {
+    "editor.formatOnPaste": false,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always",
+      "source.fixAll": "always"
+    }
+  },
+  "search.exclude": {
+    "**/id-list.csv": true,
+    "yarn.lock": true,
+    ".yarn": true,
+    "dist": true,
+  },
+  "git.autofetch": "all",
+  "typescript.tsdk": "node_modules\\typescript\\lib"
+}
